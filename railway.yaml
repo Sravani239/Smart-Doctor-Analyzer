@@ -1,0 +1,35 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    port: 8080
+    environment:
+      SPRING_DATASOURCE_URL: ${{MYSQL_URL}}
+      SPRING_DATASOURCE_USERNAME: ${{MYSQL_USER}}
+      SPRING_DATASOURCE_PASSWORD: ${{MYSQL_PASSWORD}}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    depends_on:
+      - mysql
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    port: 3000
+    environment:
+      VITE_API_URL: ${{BACKEND_URL}}
+    depends_on:
+      - backend
+
+  mysql:
+    image: mysql:8.0
+    port: 3306
+    environment:
+      MYSQL_ROOT_PASSWORD: ${{MYSQL_PASSWORD}}
+      MYSQL_DATABASE: healthcare_db
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
